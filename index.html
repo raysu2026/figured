@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Figured — See Your Situation Clearly</title>
+<script src="https://unpkg.com/@clerk/clerk-js@latest/dist/clerk.browser.js" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --paper:    #F2EDE4;
+  --paper-2:  #EAE4D8;
+  --warm-gray:#B0A898;
+  --charcoal: #2C2A27;
+  --ink:      #4A4540;
+  --green:    #4A7C59;
+  --amber:    #8B6914;
+  --red:      #8B3A3A;
+  --sd: rgba(180,168,152,0.6);
+  --sl: rgba(255,252,248,0.92);
+}
+html { scrollbar-gutter: stable both-edges; overflow-y: scroll; }
+body {
+  background: var(--paper);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  font-family: 'Georgia', serif;
+  color: var(--charcoal);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+}
+
+.card {
+  width: 580px;
+  max-width: 100%;
+  background: var(--paper);
+  border-radius: 24px;
+  box-shadow:
+    0 24px 48px rgba(140,130,115,0.35),
+    0 12px 24px rgba(140,130,115,0.25),
+    0 4px 8px rgba(140,130,115,0.15),
+    inset 0 1px 0 rgba(255,252,248,0.8),
+    inset 0 -1px 0 rgba(180,170,155,0.15);
+  padding: 44px 36px 40px;
+  border: 1px solid rgba(180,170,155,0.25);
+  background-image: linear-gradient(180deg, rgba(255,252,248,0.4) 0%, transparent 8%, transparent 92%, rgba(180,170,155,0.08) 100%);
+}
+@media (max-width: 640px) {
+  .card {
+    box-shadow:
+      0 20px 40px rgba(130,120,105,0.4),
+      0 10px 20px rgba(130,120,105,0.3),
+      0 3px 6px rgba(130,120,105,0.2),
+      inset 0 1px 0 rgba(255,252,248,0.7);
+    padding: 32px 20px 28px;
+    border-radius: 20px;
+    border: 1px solid rgba(170,160,145,0.3);
+  }
+}
+
+.logo {
+  font-family: 'Courier New', monospace;
+  font-size: 10px; letter-spacing: .35em; text-transform: uppercase;
+  color: var(--warm-gray); margin-bottom: 36px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(180,170,155,0.25);
+  display: flex; align-items: center; gap: 10px;
+}
+.logo::before {
+  content: '';
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 2px rgba(74,124,89,0.2);
+}
+
+.headline { font-size: 28px; line-height: 1.5; margin-bottom: 16px; max-width: 24ch; text-wrap: balance; }
+.sub { font-size: 14px; color: var(--warm-gray); line-height: 1.85; margin-bottom: 36px; max-width: 38ch; font-style: italic; }
+
+/* Auth Section */
+.auth-section { text-align: center; padding: 20px 0; }
+.auth-section h2 { font-size: 24px; margin-bottom: 12px; }
+.auth-section p { color: var(--warm-gray); margin-bottom: 24px; font-size: 14px; }
+.free-badge { 
+  display: inline-block;
+  background: var(--amber); 
+  color: white; 
+  padding: 4px 12px; 
+  border-radius: 20px; 
+  font-size: 12px; 
+  margin-bottom: 20px;
+}
+
+/* Usage Counter */
+.usage-counter {
+  text-align: center;
+  padding: 12px 16px;
+  background: var(--paper-2);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: var(--warm-gray);
+}
+.usage-counter strong {
+  color: var(--green);
+  font-size: 18px;
+}
+
+/* Paywall */
+.paywall {
+  text-align: center;
+  padding: 32px 20px;
+  background: var(--paper-2);
+  border-radius: 16px;
+  margin-top: 20px;
+}
+.paywall h3 { font-size: 18px; margin-bottom: 12px; }
+.paywall p { color: var(--warm-gray); margin-bottom: 20px; font-size: 14px; }
+.paywall-btn {
+  padding: 12px 28px;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.upload-zone {
+  border: 1.5px dashed var(--warm-gray);
+  border-radius: 16px;
+  padding: 32px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s ease;
+  background: rgba(255,252,248,0.3);
+}
+.upload-zone:hover {
+  border-color: var(--charcoal);
+  background: rgba(255,252,248,0.5);
+}
+.upload-zone.dragover {
+  border-color: var(--green);
+  background: rgba(74,124,89,0.08);
+}
+.upload-icon {
+  width: 48px; height: 48px;
+  margin: 0 auto 16px;
+  opacity: .6;
+}
+.upload-zone p { font-size: 14px; color: var(--warm-gray); }
+.upload-zone .hint { font-size: 12px; margin-top: 8px; opacity: .7; }
+#file-input { display: none; }
+
+.text-input {
+  width: 100%;
+  min-height: 120px;
+  padding: 16px;
+  border: 1px solid rgba(180,170,155,0.4);
+  border-radius: 12px;
+  background: rgba(255,252,248,0.5);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.7;
+  resize: vertical;
+  margin-top: 20px;
+}
+.text-input:focus {
+  outline: none;
+  border-color: var(--charcoal);
+}
+.text-input::placeholder { color: var(--warm-gray); opacity: .7; }
+
+.analyze-btn {
+  width: 100%;
+  padding: 16px 24px;
+  margin-top: 20px;
+  background: var(--charcoal);
+  color: var(--paper);
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.analyze-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(44,42,39,0.25);
+}
+.analyze-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.result-section {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(180,170,155,0.25);
+}
+.equation-box {
+  background: var(--paper-2);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.equation-box h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  color: var(--warm-gray);
+  margin-bottom: 12px;
+}
+.equation {
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--warm-gray);
+}
+.spinner {
+  width: 32px; height: 32px;
+  border: 2px solid rgba(180,170,155,0.3);
+  border-top-color: var(--charcoal);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error {
+  background: rgba(139,58,58,0.08);
+  color: var(--red);
+  padding: 16px;
+  border-radius: 10px;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+/* Hide elements by default */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">Figured</div>
+  
+  <!-- Auth Screen -->
+  <div id="auth-screen">
+    <div class="auth-section">
+      <h2>See Your Situation Clearly</h2>
+      <p>Upload a screenshot or describe what's stuck.<br>We'll help you see the pattern.</p>
+      <div class="free-badge">🎁 First 3 analyses free</div>
+      <div id="clerk-sign-in"></div>
+    </div>
+  </div>
+  
+  <!-- Main App Screen -->
+  <div id="app-screen" class="hidden">
+    <div class="usage-counter">
+      <strong id="usage-remaining">3</strong> free analyses remaining
+    </div>
+    
+    <h1 class="headline">What's stuck?</h1>
+    <p class="sub">Drop a screenshot of any conversation, notes, or just type what's on your mind.</p>
+    
+    <div class="upload-zone" id="upload-zone">
+      <div class="upload-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17,8 12,3 7,8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </div>
+      <p>Drop screenshot here, or click to browse</p>
+      <p class="hint">WeChat, WhatsApp, Notes — anything</p>
+      <input type="file" id="file-input" accept="image/*" multiple>
+    </div>
+    
+    <textarea class="text-input" id="text-input" placeholder="Or type what's going on..."></textarea>
+    
+    <button class="analyze-btn" id="analyze-btn">Analyze</button>
+    
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p>Looking for patterns...</p>
+    </div>
+    
+    <div id="error" class="error hidden"></div>
+    
+    <div id="result" class="result-section hidden"></div>
+    
+    <!-- Paywall -->
+    <div id="paywall" class="paywall hidden">
+      <h3>✨ You've used your 3 free analyses</h3>
+      <p>Get unlimited clarity for your situations</p>
+      <button class="paywall-btn" onclick="alert('Payment coming soon!')">Continue — $1</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Clerk Configuration
+const clerkPubKey = 'pk_test_c2luZ3VsYXItbWFjYXF1ZS01OS5jbGVyay5hY2NvdW50cy5kZXYk';
+
+let currentUser = null;
+let usageCount = 0;
+const FREE_LIMIT = 3;
+
+// Initialize Clerk
+window.addEventListener('load', async () => {
+  try {
+    await Clerk.load({
+      publishableKey: clerkPubKey
+    });
+    
+    if (Clerk.user) {
+      currentUser = Clerk.user;
+      showApp();
+      loadUsage();
+    } else {
+      showAuth();
+      Clerk.mountSignIn(document.getElementById('clerk-sign-in'), {
+        appearance: {
+          elements: {
+            rootBox: { width: '100%' },
+            card: { 
+              boxShadow: 'none',
+              border: '1px solid rgba(180,170,155,0.4)',
+              borderRadius: '12px'
+            }
+          }
+        }
+      });
+    }
+    
+    // Listen for auth state changes
+    Clerk.addListener(({ user }) => {
+      if (user && !currentUser) {
+        currentUser = user;
+        showApp();
+        loadUsage();
+      }
+    });
+  } catch (err) {
+    console.error('Clerk init error:', err);
+    // Fallback: show app without auth
+    showApp();
+  }
+});
+
+function showAuth() {
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('app-screen').classList.add('hidden');
+}
+
+function showApp() {
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('app-screen').classList.remove('hidden');
+}
+
+// Usage Tracking
+function loadUsage() {
+  if (!currentUser) return;
+  const key = `figured_usage_${currentUser.id}`;
+  usageCount = parseInt(localStorage.getItem(key) || '0');
+  updateUsageDisplay();
+}
+
+function incrementUsage() {
+  if (!currentUser) return;
+  const key = `figured_usage_${currentUser.id}`;
+  usageCount++;
+  localStorage.setItem(key, usageCount.toString());
+  updateUsageDisplay();
+}
+
+function updateUsageDisplay() {
+  const remaining = Math.max(0, FREE_LIMIT - usageCount);
+  document.getElementById('usage-remaining').textContent = remaining;
+  
+  if (usageCount >= FREE_LIMIT) {
+    document.getElementById('paywall').classList.remove('hidden');
+    document.getElementById('analyze-btn').disabled = true;
+    document.getElementById('analyze-btn').textContent = 'Upgrade to continue';
+  }
+}
+
+// File Upload
+const uploadZone = document.getElementById('upload-zone');
+const fileInput = document.getElementById('file-input');
+
+uploadZone.addEventListener('click', () => fileInput.click());
+
+uploadZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadZone.classList.add('dragover');
+});
+
+uploadZone.addEventListener('dragleave', () => {
+  uploadZone.classList.remove('dragover');
+});
+
+uploadZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  handleFiles(e.dataTransfer.files);
+});
+
+fileInput.addEventListener('change', (e) => {
+  handleFiles(e.target.files);
+});
+
+function handleFiles(files) {
+  if (files.length > 0) {
+    window.selectedFiles = Array.from(files);
+    uploadZone.querySelector('p').textContent = `${files.length} file(s) selected`;
+  }
+}
+
+// Analysis
+async function analyze() {
+  if (currentUser && usageCount >= FREE_LIMIT) {
+    document.getElementById('paywall').scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
+  
+  const text = document.getElementById('text-input').value.trim();
+  const files = window.selectedFiles || [];
+  
+  if (!text && files.length === 0) {
+    showError('Please describe your situation or upload a screenshot');
+    return;
+  }
+  
+  document.getElementById('loading').classList.remove('hidden');
+  document.getElementById('error').classList.add('hidden');
+  document.getElementById('result').classList.add('hidden');
+  
+  try {
+    // TODO: Call API
+    await new Promise(r => setTimeout(r, 2000));
+    
+    if (currentUser) incrementUsage();
+    
+    showResult({
+      equation: "Your Situation = External Pressure + Internal Conflict",
+      factors: ["Boss request", "Weekend work", "Family promise"],
+      paths: ["Negotiate timeline", "Find alternative", "Set boundary"]
+    });
+  } catch (err) {
+    showError('Analysis failed. Please try again.');
+  } finally {
+    document.getElementById('loading').classList.add('hidden');
+  }
+}
+
+document.getElementById('analyze-btn').addEventListener('click', analyze);
+
+function showResult(data) {
+  const resultDiv = document.getElementById('result');
+  resultDiv.innerHTML = `
+    <div class="equation-box">
+      <h4>Core Equation</h4>
+      <div class="equation">${data.equation}</div>
+    </div>
+    <div class="equation-box">
+      <h4>Key Factors</h4>
+      <div class="equation">${data.factors.join(' + ')}</div>
+    </div>
+    <div class="equation-box">
+      <h4>Possible Paths</h4>
+      <div class="equation">${data.paths.join(' | ')}</div>
+    </div>
+  `;
+  resultDiv.classList.remove('hidden');
+}
+
+function showError(msg) {
+  const errorDiv = document.getElementById('error');
+  errorDiv.textContent = msg;
+  errorDiv.classList.remove('hidden');
+}
+</script>
+</body>
+</html>
