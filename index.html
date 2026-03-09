@@ -1,275 +1,446 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Figured — See Your Situation Clearly</title>
-<script async crossorigin="anonymous" data-clerk-publishable-key="pk_test_c2luZ3VsYXItbWFjYXF1ZS01OS5jbGVyay5hY2NvdW50cy5kZXYk" src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js" type="text/javascript"></script>
+<title>Figured — 看清你的处境</title>
+<script src="https://unpkg.com/@clerk/clerk-js@latest/dist/clerk.browser.js" crossorigin="anonymous"></script>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --paper:    #F2EDE4;
-  --paper-2:  #EAE4D8;
-  --warm-gray:#B0A898;
+  --paper: #F2EDE4;
+  --paper-dark: #E8E4DA;
   --charcoal: #2C2A27;
-  --ink:      #4A4540;
-  --green:    #4A7C59;
-  --amber:    #8B6914;
-  --red:      #8B3A3A;
-  --sd: rgba(180,168,152,0.6);
-  --sl: rgba(255,252,248,0.92);
+  --warm-gray: #8B8680;
+  --green: #4A7C59;
+  --amber: #B8860B;
+  --red: #8B3A3A;
+  
+  /* CHASKI 软UI阴影 */
+  --shadow-out: 8px 8px 16px #D1CFC7, -8px -8px 16px #FFFFFF;
+  --shadow-in: inset 4px 4px 8px #D1CFC7, inset -4px -4px 8px #FFFFFF;
+  --shadow-out-sm: 4px 4px 8px #D1CFC7, -4px -4px 8px #FFFFFF;
+  --shadow-in-sm: inset 2px 2px 4px #D1CFC7, inset -2px -2px 4px #FFFFFF;
 }
-html { scrollbar-gutter: stable both-edges; overflow-y: scroll; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scrollbar-gutter: stable both-edges; }
+
 body {
   background: var(--paper);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-  font-family: 'Georgia', serif;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', sans-serif;
   color: var(--charcoal);
   min-height: 100vh;
   display: flex;
-  align-items: flex-start;
   justify-content: center;
-  padding: 3rem 1.5rem;
+  padding: 2rem 1rem;
 }
 
 .card {
-  width: 580px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 480px;
   background: var(--paper);
   border-radius: 24px;
-  box-shadow:
-    0 24px 48px rgba(140,130,115,0.35),
-    0 12px 24px rgba(140,130,115,0.25),
-    0 4px 8px rgba(140,130,115,0.15),
-    inset 0 1px 0 rgba(255,252,248,0.8),
-    inset 0 -1px 0 rgba(180,170,155,0.15);
-  padding: 44px 36px 40px;
-  border: 1px solid rgba(180,170,155,0.25);
-  background-image: linear-gradient(180deg, rgba(255,252,248,0.4) 0%, transparent 8%, transparent 92%, rgba(180,170,155,0.08) 100%);
-}
-@media (max-width: 640px) {
-  .card {
-    box-shadow:
-      0 20px 40px rgba(130,120,105,0.4),
-      0 10px 20px rgba(130,120,105,0.3),
-      0 3px 6px rgba(130,120,105,0.2),
-      inset 0 1px 0 rgba(255,252,248,0.7);
-    padding: 32px 20px 28px;
-    border-radius: 20px;
-    border: 1px solid rgba(170,160,145,0.3);
-  }
+  box-shadow: var(--shadow-out);
+  padding: 32px 24px;
+  border: 1px solid rgba(255,255,255,0.6);
 }
 
+/* Logo */
 .logo {
-  font-family: 'Courier New', monospace;
-  font-size: 10px; letter-spacing: .35em; text-transform: uppercase;
-  color: var(--warm-gray); margin-bottom: 36px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
   padding-bottom: 16px;
-  border-bottom: 1px solid rgba(180,170,155,0.25);
-  display: flex; align-items: center; gap: 10px;
-}
-.logo::before {
-  content: '';
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 0 2px rgba(74,124,89,0.2);
+  border-bottom: 1px solid rgba(139,134,128,0.2);
 }
 
-.headline { font-size: 28px; line-height: 1.5; margin-bottom: 16px; max-width: 24ch; text-wrap: balance; }
-.sub { font-size: 14px; color: var(--warm-gray); line-height: 1.85; margin-bottom: 36px; max-width: 38ch; font-style: italic; }
-
-/* Auth Section */
-.auth-section { text-align: center; padding: 20px 0; }
-.auth-section h2 { font-size: 24px; margin-bottom: 12px; }
-.auth-section p { color: var(--warm-gray); margin-bottom: 24px; font-size: 14px; }
-.free-badge { 
-  display: inline-block;
-  background: var(--amber); 
-  color: white; 
-  padding: 4px 12px; 
-  border-radius: 20px; 
-  font-size: 12px; 
-  margin-bottom: 20px;
-}
-
-/* Usage Counter */
-.usage-counter {
-  text-align: center;
-  padding: 12px 16px;
-  background: var(--paper-2);
+.logo-icon {
+  width: 32px;
+  height: 32px;
   border-radius: 10px;
-  margin-bottom: 20px;
+  background: var(--green);
+  box-shadow: var(--shadow-out-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--charcoal);
+}
+
+/* Usage counter */
+.usage-counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--paper);
+  box-shadow: var(--shadow-in-sm);
+  border-radius: 12px;
+  margin-bottom: 24px;
   font-size: 13px;
   color: var(--warm-gray);
 }
+
 .usage-counter strong {
   color: var(--green);
   font-size: 18px;
 }
 
-/* Paywall */
-.paywall {
-  text-align: center;
-  padding: 32px 20px;
-  background: var(--paper-2);
-  border-radius: 16px;
-  margin-top: 20px;
-}
-.paywall h3 { font-size: 18px; margin-bottom: 12px; }
-.paywall p { color: var(--warm-gray); margin-bottom: 20px; font-size: 14px; }
-.paywall-btn {
-  padding: 12px 28px;
-  background: var(--green);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
+/* Headline */
+.headline {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  color: var(--charcoal);
 }
 
+.sub {
+  font-size: 14px;
+  color: var(--warm-gray);
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+/* Upload zone - 外凸 */
 .upload-zone {
-  border: 1.5px dashed var(--warm-gray);
   border-radius: 16px;
-  padding: 32px 24px;
+  padding: 40px 24px;
   text-align: center;
   cursor: pointer;
-  transition: all .2s ease;
-  background: rgba(255,252,248,0.3);
+  background: var(--paper);
+  box-shadow: var(--shadow-out);
+  border: 1px solid rgba(255,255,255,0.5);
+  transition: all 0.2s ease;
+  margin-bottom: 16px;
 }
+
 .upload-zone:hover {
-  border-color: var(--charcoal);
-  background: rgba(255,252,248,0.5);
+  box-shadow: var(--shadow-out-sm);
 }
+
+.upload-zone:active {
+  box-shadow: var(--shadow-in);
+}
+
 .upload-zone.dragover {
-  border-color: var(--green);
-  background: rgba(74,124,89,0.08);
+  box-shadow: var(--shadow-in);
+  background: var(--paper-dark);
 }
+
 .upload-icon {
-  width: 48px; height: 48px;
+  width: 48px;
+  height: 48px;
   margin: 0 auto 16px;
-  opacity: .6;
+  opacity: 0.5;
+  color: var(--warm-gray);
 }
-.upload-zone p { font-size: 14px; color: var(--warm-gray); }
-.upload-zone .hint { font-size: 12px; margin-top: 8px; opacity: .7; }
+
+.upload-zone p {
+  font-size: 14px;
+  color: var(--warm-gray);
+  margin-bottom: 8px;
+}
+
+.upload-zone .hint {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
 #file-input { display: none; }
 
+/* Text input - 内凹 */
 .text-input {
   width: 100%;
   min-height: 120px;
   padding: 16px;
-  border: 1px solid rgba(180,170,155,0.4);
+  border: none;
   border-radius: 12px;
-  background: rgba(255,252,248,0.5);
+  background: var(--paper);
+  box-shadow: var(--shadow-in-sm);
   font-family: inherit;
   font-size: 15px;
   line-height: 1.7;
   resize: vertical;
-  margin-top: 20px;
+  margin-bottom: 16px;
+  color: var(--charcoal);
 }
+
 .text-input:focus {
   outline: none;
-  border-color: var(--charcoal);
+  box-shadow: var(--shadow-in);
 }
-.text-input::placeholder { color: var(--warm-gray); opacity: .7; }
 
+.text-input::placeholder {
+  color: var(--warm-gray);
+  opacity: 0.6;
+}
+
+/* Analyze button - 外凸 */
 .analyze-btn {
   width: 100%;
   padding: 16px 24px;
-  margin-top: 20px;
-  background: var(--charcoal);
-  color: var(--paper);
   border: none;
   border-radius: 12px;
+  background: var(--paper);
+  box-shadow: var(--shadow-out);
   font-family: inherit;
   font-size: 15px;
+  font-weight: 700;
+  color: var(--charcoal);
   cursor: pointer;
-  transition: transform .15s ease, box-shadow .15s ease;
+  transition: all 0.15s ease;
 }
+
 .analyze-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(44,42,39,0.25);
+  box-shadow: var(--shadow-out-sm);
 }
+
+.analyze-btn:active:not(:disabled) {
+  box-shadow: var(--shadow-in);
+  transform: scale(0.98);
+}
+
 .analyze-btn:disabled {
-  opacity: .5;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.result-section {
-  margin-top: 32px;
-  padding-top: 32px;
-  border-top: 1px solid rgba(180,170,155,0.25);
-}
-.equation-box {
-  background: var(--paper-2);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-.equation-box h4 {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: .15em;
-  color: var(--warm-gray);
-  margin-bottom: 12px;
-}
-.equation {
-  font-family: 'Courier New', monospace;
-  font-size: 16px;
-  line-height: 1.6;
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
+/* Loading */
 .loading {
   text-align: center;
   padding: 40px;
   color: var(--warm-gray);
 }
+
 .spinner {
-  width: 32px; height: 32px;
-  border: 2px solid rgba(180,170,155,0.3);
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--paper-dark);
   border-top-color: var(--charcoal);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 16px;
 }
+
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Result cards - 外凸 */
+.result-section {
+  margin-top: 28px;
+}
+
+.equation-card {
+  background: var(--paper);
+  box-shadow: var(--shadow-out);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(255,255,255,0.5);
+}
+
+.equation-card h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--warm-gray);
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.equation {
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--charcoal);
+}
+
+/* Question card */
+.question-card {
+  background: var(--paper);
+  box-shadow: var(--shadow-out);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 20px;
+  border-left: 4px solid var(--amber);
+}
+
+.question-card p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--charcoal);
+}
+
+/* Paths */
+.path-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.path-item {
+  background: var(--paper);
+  box-shadow: var(--shadow-out-sm);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.path-label {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: var(--shadow-out-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+.path-content {
+  flex: 1;
+}
+
+.path-name {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.path-desc {
+  font-size: 13px;
+  color: var(--warm-gray);
+  line-height: 1.5;
+}
+
+/* Paywall */
+.paywall {
+  text-align: center;
+  padding: 32px 24px;
+  background: var(--paper);
+  box-shadow: var(--shadow-in);
+  border-radius: 16px;
+  margin-top: 20px;
+}
+
+.paywall h3 {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.paywall p {
+  color: var(--warm-gray);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.paywall-btn {
+  padding: 14px 32px;
+  border: none;
+  border-radius: 10px;
+  background: var(--green);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-out-sm);
+}
+
+/* Auth */
+.auth-section {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.auth-section h2 {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.auth-section p {
+  color: var(--warm-gray);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.free-badge {
+  display: inline-block;
+  background: var(--amber);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-out-sm);
+}
+
+/* Error */
 .error {
   background: rgba(139,58,58,0.08);
   color: var(--red);
   padding: 16px;
-  border-radius: 10px;
-  margin-top: 20px;
+  border-radius: 12px;
+  margin-top: 16px;
   font-size: 14px;
+  box-shadow: var(--shadow-in-sm);
 }
 
-/* Hide elements by default */
+/* Hidden */
 .hidden { display: none !important; }
+
+/* Responsive */
+@media (max-width: 480px) {
+  body { padding: 1rem; }
+  .card { padding: 24px 20px; }
+  .headline { font-size: 20px; }
+}
 </style>
 </head>
 <body>
 <div class="card">
-  <div class="logo">Figured</div>
+  <div class="logo">
+    <div class="logo-icon">F</div>
+    <div class="logo-text">Figured</div>
+  </div>
   
   <!-- Auth Screen -->
   <div id="auth-screen">
     <div class="auth-section">
-      <h2>See Your Situation Clearly</h2>
-      <p>Upload a screenshot or describe what's stuck.<br>We'll help you see the pattern.</p>
-      <div class="free-badge">🎁 First 3 analyses free</div>
+      <h2>看清你的处境</h2>
+      <p>上传聊天记录或描述你的困扰<br>我们用简单方程帮你理清</p>
+      <div class="free-badge">🎁 前 3 次免费</div>
       <div id="clerk-sign-in"></div>
     </div>
   </div>
   
-  <!-- Main App Screen -->
+  <!-- Main App -->
   <div id="app-screen" class="hidden">
     <div class="usage-counter">
-      <strong id="usage-remaining">3</strong> free analyses remaining
+      剩余 <strong id="usage-remaining">3</strong> 次免费分析
     </div>
     
-    <h1 class="headline">What's stuck?</h1>
-    <p class="sub">Drop a screenshot of any conversation, notes, or just type what's on your mind.</p>
+    <h1 class="headline">发生了什么？</h1>
+    <p class="sub">截图聊天记录，或简单描述你的困扰。我们不评判，只帮你一起看清楚。</p>
     
     <div class="upload-zone" id="upload-zone">
       <div class="upload-icon">
@@ -279,18 +450,20 @@ body {
           <line x1="12" y1="3" x2="12" y2="15"/>
         </svg>
       </div>
-      <p>Drop screenshot here, or click to browse</p>
-      <p class="hint">WeChat, WhatsApp, Notes — anything</p>
+      <p>点击或拖拽上传截图</p>
+      <p class="hint">微信、钉钉、邮件 — 都可以</p>
       <input type="file" id="file-input" accept="image/*" multiple>
     </div>
     
-    <textarea class="text-input" id="text-input" placeholder="Or type what's going on..."></textarea>
+    <textarea class="text-input" id="text-input" placeholder="或者在这里打字描述...
+
+比如：老板突然让我周末加班，但我已经答应了孩子去公园"></textarea>
     
-    <button class="analyze-btn" id="analyze-btn">Analyze</button>
+    <button class="analyze-btn" id="analyze-btn">开始分析</button>
     
     <div id="loading" class="loading hidden">
       <div class="spinner"></div>
-      <p>Looking for patterns...</p>
+      <p>正在理清...</p>
     </div>
     
     <div id="error" class="error hidden"></div>
@@ -299,27 +472,26 @@ body {
     
     <!-- Paywall -->
     <div id="paywall" class="paywall hidden">
-      <h3>✨ You've used your 3 free analyses</h3>
-      <p>Get unlimited clarity for your situations</p>
-      <button class="paywall-btn" onclick="alert('Payment coming soon!')">Continue — $1</button>
+      <h3>✨ 免费次数已用完</h3>
+      <p>继续看清你的处境</p>
+      <button class="paywall-btn" onclick="alert('支付功能即将上线')">继续分析 — ¥1</button>
     </div>
   </div>
 </div>
 
 <script>
-// Clerk Configuration
+// Clerk config
 const clerkPubKey = 'pk_test_c2luZ3VsYXItbWFjYXF1ZS01OS5jbGVyay5hY2NvdW50cy5kZXYk';
 
 let currentUser = null;
 let usageCount = 0;
 const FREE_LIMIT = 3;
+let conversationHistory = [];
 
-// Initialize Clerk
+// Init Clerk
 window.addEventListener('load', async () => {
   try {
-    await Clerk.load({
-      publishableKey: clerkPubKey
-    });
+    await Clerk.load({ publishableKey: clerkPubKey });
     
     if (Clerk.user) {
       currentUser = Clerk.user;
@@ -333,15 +505,13 @@ window.addEventListener('load', async () => {
             rootBox: { width: '100%' },
             card: { 
               boxShadow: 'none',
-              border: '1px solid rgba(180,170,155,0.4)',
-              borderRadius: '12px'
+              background: 'transparent'
             }
           }
         }
       });
     }
     
-    // Listen for auth state changes
     Clerk.addListener(({ user }) => {
       if (user && !currentUser) {
         currentUser = user;
@@ -350,9 +520,8 @@ window.addEventListener('load', async () => {
       }
     });
   } catch (err) {
-    console.error('Clerk init error:', err);
-    // Fallback: show app without auth
-    showApp();
+    console.error('Clerk error:', err);
+    showApp(); // Fallback
   }
 });
 
@@ -366,7 +535,7 @@ function showApp() {
   document.getElementById('app-screen').classList.remove('hidden');
 }
 
-// Usage Tracking
+// Usage tracking
 function loadUsage() {
   if (!currentUser) return;
   const key = `figured_usage_${currentUser.id}`;
@@ -389,11 +558,11 @@ function updateUsageDisplay() {
   if (usageCount >= FREE_LIMIT) {
     document.getElementById('paywall').classList.remove('hidden');
     document.getElementById('analyze-btn').disabled = true;
-    document.getElementById('analyze-btn').textContent = 'Upgrade to continue';
+    document.getElementById('analyze-btn').textContent = '升级继续';
   }
 }
 
-// File Upload
+// File upload
 const uploadZone = document.getElementById('upload-zone');
 const fileInput = document.getElementById('file-input');
 
@@ -421,7 +590,7 @@ fileInput.addEventListener('change', (e) => {
 function handleFiles(files) {
   if (files.length > 0) {
     window.selectedFiles = Array.from(files);
-    uploadZone.querySelector('p').textContent = `${files.length} file(s) selected`;
+    uploadZone.querySelector('p').textContent = `已选择 ${files.length} 个文件`;
   }
 }
 
@@ -436,7 +605,7 @@ async function analyze() {
   const files = window.selectedFiles || [];
   
   if (!text && files.length === 0) {
-    showError('Please describe your situation or upload a screenshot');
+    showError('请上传截图或描述你的困扰');
     return;
   }
   
@@ -445,41 +614,115 @@ async function analyze() {
   document.getElementById('result').classList.add('hidden');
   
   try {
-    // TODO: Call API
-    await new Promise(r => setTimeout(r, 2000));
+    const payload = { lang: 'zh' };
+    
+    if (files.length > 0) {
+      payload.images = await Promise.all(files.map(async file => ({
+        mimeType: file.type,
+        base64: await readFileAsBase64(file)
+      })));
+    }
+    
+    if (text) payload.text = text;
+    
+    // Add conversation history for follow-up questions
+    if (conversationHistory.length > 0) {
+      payload.conversation_history = conversationHistory;
+    }
+    
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    
+    const data = await response.json();
+    
+    if (!data.ok) throw new Error(data.error);
     
     if (currentUser) incrementUsage();
     
-    showResult({
-      equation: "Your Situation = External Pressure + Internal Conflict",
-      factors: ["Boss request", "Weekend work", "Family promise"],
-      paths: ["Negotiate timeline", "Find alternative", "Set boundary"]
-    });
+    // Add to conversation history
+    conversationHistory.push({ role: 'user', content: text || '[图片]' });
+    conversationHistory.push({ role: 'assistant', content: JSON.stringify(data.analysis) });
+    
+    showResult(data.analysis);
+    
   } catch (err) {
-    showError('Analysis failed. Please try again.');
+    showError('分析出错，请重试');
+    console.error(err);
   } finally {
     document.getElementById('loading').classList.add('hidden');
   }
 }
 
-document.getElementById('analyze-btn').addEventListener('click', analyze);
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
-function showResult(data) {
+function showResult(analysis) {
   const resultDiv = document.getElementById('result');
-  resultDiv.innerHTML = `
-    <div class="equation-box">
-      <h4>Core Equation</h4>
-      <div class="equation">${data.equation}</div>
-    </div>
-    <div class="equation-box">
-      <h4>Key Factors</h4>
-      <div class="equation">${data.factors.join(' + ')}</div>
-    </div>
-    <div class="equation-box">
-      <h4>Possible Paths</h4>
-      <div class="equation">${data.paths.join(' | ')}</div>
-    </div>
-  `;
+  
+  if (analysis.status === 'incomplete') {
+    // Show question
+    resultDiv.innerHTML = `
+      <div class="question-card">
+        <p>${analysis.question}</p>
+      </div>
+    `;
+  } else {
+    // Show equation
+    let html = `
+      <div class="equation-card">
+        <h4>你的处境</h4>
+        <div class="equation">${analysis.equation || analysis.core_equation}</div>
+      </div>
+    `;
+    
+    if (analysis.factors && analysis.factors.length > 0) {
+      analysis.factors.forEach(factor => {
+        html += `
+          <div class="equation-card">
+            <h4>${factor.name}</h4>
+            <div class="equation">${factor.equation || factor.details?.join(' + ')}</div>
+          </div>
+        `;
+      });
+    }
+    
+    if (analysis.paths && analysis.paths.length > 0) {
+      html += '<div class="equation-card"><h4>可能的选择</h4><div class="path-list">';
+      analysis.paths.forEach((path, i) => {
+        html += `
+          <div class="path-item">
+            <div class="path-label">${path.label || String.fromCharCode(65 + i)}</div>
+            <div class="path-content">
+              <div class="path-name">${path.name || path.label}</div>
+              <div class="path-desc">${path.desc || path.action}</div>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div></div>';
+    }
+    
+    if (analysis.closing) {
+      html += `
+        <div class="equation-card">
+          <h4>一句话</h4>
+          <div class="equation" style="font-style: italic;">${analysis.closing}</div>
+        </div>
+      `;
+    }
+    
+    resultDiv.innerHTML = html;
+  }
+  
   resultDiv.classList.remove('hidden');
 }
 
@@ -488,6 +731,8 @@ function showError(msg) {
   errorDiv.textContent = msg;
   errorDiv.classList.remove('hidden');
 }
+
+document.getElementById('analyze-btn').addEventListener('click', analyze);
 </script>
 </body>
 </html>
