@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Figured — 看清你的处境</title>
-<script src="https://unpkg.com/@clerk/clerk-js@latest/dist/clerk.browser.js" crossorigin="anonymous"></script>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <style>
 :root {
   --paper: #F2EDE4;
@@ -79,24 +81,6 @@ body {
 }
 
 /* Usage counter */
-.usage-counter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: var(--paper);
-  box-shadow: var(--shadow-in-sm);
-  border-radius: 12px;
-  margin-bottom: 24px;
-  font-size: 13px;
-  color: var(--warm-gray);
-}
-
-.usage-counter strong {
-  color: var(--green);
-  font-size: 18px;
-}
 
 /* Headline */
 .headline {
@@ -112,6 +96,7 @@ body {
   color: var(--warm-gray);
   line-height: 1.7;
   margin-bottom: 28px;
+  text-wrap: balance;
 }
 
 /* Upload zone - 外凸 */
@@ -159,7 +144,95 @@ body {
   opacity: 0.7;
 }
 
+/* 拟物化文件显示 */
+.upload-file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--paper);
+  box-shadow: var(--shadow-out-sm);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  animation: dropIn 0.3s ease;
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.file-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: var(--shadow-in-sm);
+}
+
+.file-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: var(--paper-dark);
+  box-shadow: var(--shadow-in-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.file-info {
+  flex: 1;
+  text-align: left;
+}
+
+.file-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--charcoal);
+  margin-bottom: 2px;
+}
+
+.file-size {
+  font-size: 11px;
+  color: var(--warm-gray);
+}
+
+.file-remove {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: var(--shadow-out-sm);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--warm-gray);
+  font-size: 16px;
+}
+
+.file-remove:active {
+  box-shadow: var(--shadow-in-sm);
+}
+
 #file-input { display: none; }
+
+.upload-add-more {
+  margin-top: 4px;
+  padding: 10px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--warm-gray);
+  cursor: pointer;
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: var(--shadow-out-sm);
+  transition: box-shadow 0.15s;
+}
+.upload-add-more:active { box-shadow: var(--shadow-in-sm); }
 
 /* Text input - 内凹 */
 .text-input {
@@ -333,37 +406,6 @@ body {
 }
 
 /* Paywall */
-.paywall {
-  text-align: center;
-  padding: 32px 24px;
-  background: var(--paper);
-  box-shadow: var(--shadow-in);
-  border-radius: 16px;
-  margin-top: 20px;
-}
-
-.paywall h3 {
-  font-size: 16px;
-  margin-bottom: 12px;
-}
-
-.paywall p {
-  color: var(--warm-gray);
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-.paywall-btn {
-  padding: 14px 32px;
-  border: none;
-  border-radius: 10px;
-  background: var(--green);
-  color: white;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: var(--shadow-out-sm);
-}
 
 /* Auth */
 .auth-section {
@@ -405,6 +447,373 @@ body {
   box-shadow: var(--shadow-in-sm);
 }
 
+/* ── 方程结果排版 ── */
+
+/* 步骤块 */
+.eq-step {
+  margin-top: 24px;
+}
+
+.eq-step-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.eq-step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: var(--shadow-out-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+.eq-step-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--warm-gray);
+}
+
+/* 公式显示块 */
+.eq-formula-block {
+  background: rgba(139,134,128,0.07);
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-family: 'Courier New', 'SF Mono', monospace;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--charcoal);
+  white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.eq-note {
+  font-size: 12px;
+  color: var(--warm-gray);
+  margin-top: 8px;
+  line-height: 1.6;
+  font-family: inherit;
+}
+
+/* 因素展开块 */
+.eq-factor {
+  padding: 12px 0 12px 16px;
+  border-left: 2px solid rgba(74,107,79,0.25);
+  margin-bottom: 12px;
+}
+
+.eq-factor-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--green);
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+
+.eq-factor-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.eq-factor-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: 'Courier New', 'SF Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--charcoal);
+}
+
+.eq-factor-op {
+  width: 12px;
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--warm-gray);
+  text-align: center;
+}
+
+.eq-factor-expr {
+  flex: 1;
+  text-wrap: balance;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.eq-factor-note {
+  font-size: 12px;
+  color: var(--warm-gray);
+  margin-top: 8px;
+  line-height: 1.5;
+  border-top: 1px solid rgba(139,134,128,0.15);
+  padding-top: 8px;
+}
+
+/* 系数分析：两列 */
+.eq-coeff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.eq-coeff-item {
+  padding: 10px 0;
+}
+
+.eq-coeff-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.eq-coeff-label.can { color: var(--green); }
+.eq-coeff-label.cannot { color: var(--red); }
+
+.eq-coeff-content {
+  font-size: 12px;
+  color: var(--charcoal);
+  line-height: 1.6;
+}
+
+.eq-conclusion {
+  font-size: 13px;
+  color: var(--charcoal);
+  line-height: 1.6;
+  font-weight: 600;
+  padding: 10px 0 0;
+}
+
+/* 牌 */
+.eq-card-block {
+  padding: 14px 18px;
+  border-left: 3px solid var(--amber);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--charcoal);
+}
+
+/* 路径选择 */
+.eq-path {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(139,134,128,0.12);
+  margin-bottom: 0;
+}
+.eq-path:last-child { border-bottom: none; }
+
+.eq-path-label {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(74,107,79,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+.eq-path-content {
+  font-size: 13px;
+  color: var(--charcoal);
+  line-height: 1.6;
+  padding-top: 3px;
+}
+
+/* 检验问题 */
+.eq-question {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.eq-question-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--warm-gray);
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+.eq-question-content {
+  font-size: 13px;
+  color: var(--charcoal);
+  line-height: 1.6;
+}
+
+/* 结尾 */
+.eq-closing {
+  margin-top: 28px;
+  padding: 20px 4px;
+  border-top: 1px solid rgba(139,134,128,0.15);
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--charcoal);
+  font-style: italic;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* ── 总图景 ── */
+.ov-card {
+  margin-top: 32px;
+  padding: 20px;
+  background: var(--paper);
+  box-shadow: var(--shadow-out);
+  border-radius: 16px;
+}
+
+.ov-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.ov-header-icon {
+  font-size: 14px;
+  color: var(--warm-gray);
+  opacity: 0.6;
+}
+
+.ov-header-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--warm-gray);
+  letter-spacing: 0.1em;
+}
+
+.ov-eq {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 14px;
+  line-height: 1.6;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.ov-factors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+  justify-content: center;
+}
+
+.ov-chip {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(139,134,128,0.25);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--warm-gray);
+}
+
+.ov-chip.can { color: var(--green); border-color: rgba(74,107,79,0.3); }
+.ov-chip.cannot { color: var(--warm-gray); opacity: 0.6; }
+
+.ov-chip-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.ov-connector {
+  text-align: center;
+  color: var(--warm-gray);
+  font-size: 16px;
+  margin: 8px 0;
+  opacity: 0.4;
+}
+
+.ov-pivot {
+  padding: 10px 16px;
+  border-left: 3px solid var(--green);
+  font-size: 13px;
+  color: var(--charcoal);
+  line-height: 1.6;
+  margin-bottom: 10px;
+  text-wrap: balance;
+}
+
+.ov-pivot-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  margin-bottom: 5px;
+  letter-spacing: 0.05em;
+}
+
+.ov-paths {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ov-path-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(139,134,128,0.12);
+}
+.ov-path-item:last-child { border-bottom: none; }
+
+.ov-path-label {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(74,107,79,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+.ov-path-text {
+  font-size: 12px;
+  color: var(--charcoal);
+  line-height: 1.5;
+  padding-top: 3px;
+  text-wrap: balance;
+}
+
+/* 全局孤儿字修复 */
+.eq-formula-block, .eq-note, .eq-factor-equation, .eq-factor-note,
+.eq-coeff-content, .eq-card-block, .eq-path-content,
+.eq-question-content, .eq-conclusion {
+  text-wrap: balance;
+}
+
 /* Hidden */
 .hidden { display: none !important; }
 
@@ -413,154 +822,88 @@ body {
   body { padding: 1rem; }
   .card { padding: 24px 20px; }
   .headline { font-size: 20px; }
+  .eq-coeff-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
+<!-- 加载遮罩 -->
+<div id="loading-mask" style="position: fixed; inset: 0; background: var(--paper); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease;">
+  <div style="text-align: center; color: var(--warm-gray);">
+    <div class="spinner" style="margin-bottom: 16px;"></div>
+    <p style="font-size: 14px;">加载中...</p>
+  </div>
+</div>
+
 <div class="card">
   <div class="logo">
     <div class="logo-icon">F</div>
     <div class="logo-text">Figured</div>
   </div>
   
-  <!-- Auth Screen -->
-  <div id="auth-screen">
-    <div class="auth-section">
-      <h2>看清你的处境</h2>
-      <p>上传聊天记录或描述你的困扰<br>我们用简单方程帮你理清</p>
-      <div class="free-badge">🎁 前 3 次免费</div>
-      <div id="clerk-sign-in"></div>
-    </div>
-  </div>
-  
   <!-- Main App -->
-  <div id="app-screen" class="hidden">
-    <div class="usage-counter">
-      剩余 <strong id="usage-remaining">3</strong> 次免费分析
-    </div>
-    
-    <h1 class="headline">发生了什么？</h1>
+  <div id="app-screen">
+<h1 class="headline">发生了什么？</h1>
     <p class="sub">截图聊天记录，或简单描述你的困扰。我们不评判，只帮你一起看清楚。</p>
     
     <div class="upload-zone" id="upload-zone">
-      <div class="upload-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="17,8 12,3 7,8"/>
-          <line x1="12" y1="3" x2="12" y2="15"/>
-        </svg>
+      <div id="upload-placeholder">
+        <div class="upload-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17,8 12,3 7,8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <p>点击或拖拽上传</p>
+        <p class="hint">截图 / 聊天导出 (.txt) — 可多个</p>
       </div>
-      <p>点击或拖拽上传截图</p>
-      <p class="hint">微信、钉钉、邮件 — 都可以</p>
-      <input type="file" id="file-input" accept="image/*" multiple>
+      <div id="upload-files" class="hidden"></div>
+      <input type="file" id="file-input" accept="image/*,.txt,text/plain" multiple>
     </div>
     
     <textarea class="text-input" id="text-input" placeholder="或者在这里打字描述...
 
 比如：老板突然让我周末加班，但我已经答应了孩子去公园"></textarea>
     
-    <button class="analyze-btn" id="analyze-btn">开始分析</button>
+    <button class="analyze-btn" id="analyze-btn">分析</button>
     
-    <div id="loading" class="loading hidden">
-      <div class="spinner"></div>
-      <p>正在理清...</p>
+    <!-- Loading - 拟物感进度条 -->
+    <div id="loading" class="hidden" style="margin-top: 24px;">
+      <div style="background: var(--paper); box-shadow: var(--shadow-out); border-radius: 12px; padding: 20px; text-align: center;">
+        <p style="font-size: 14px; color: var(--warm-gray); margin-bottom: 16px;">正在理清你的处境...</p>
+        <div style="background: var(--paper-dark); box-shadow: var(--shadow-in); border-radius: 8px; height: 8px; overflow: hidden;">
+          <div id="progress-bar" style="background: var(--green); height: 100%; width: 0%; border-radius: 8px; transition: width 0.3s ease;"></div>
+        </div>
+        <p id="progress-text" style="font-size: 12px; color: var(--warm-gray); margin-top: 12px;">提取信息...</p>
+      </div>
     </div>
     
     <div id="error" class="error hidden"></div>
     
     <div id="result" class="result-section hidden"></div>
     
-    <!-- Paywall -->
-    <div id="paywall" class="paywall hidden">
-      <h3>✨ 免费次数已用完</h3>
-      <p>继续看清你的处境</p>
-      <button class="paywall-btn" onclick="alert('支付功能即将上线')">继续分析 — ¥1</button>
-    </div>
+
+    
   </div>
 </div>
 
 <script>
-// Clerk config
-const clerkPubKey = 'pk_test_c2luZ3VsYXItbWFjYXF1ZS01OS5jbGVyay5hY2NvdW50cy5kZXYk';
-
-let currentUser = null;
-let usageCount = 0;
-const FREE_LIMIT = 3;
 let conversationHistory = [];
 
-// Init Clerk
-window.addEventListener('load', async () => {
-  try {
-    await Clerk.load({ publishableKey: clerkPubKey });
-    
-    if (Clerk.user) {
-      currentUser = Clerk.user;
-      showApp();
-      loadUsage();
-    } else {
-      showAuth();
-      Clerk.mountSignIn(document.getElementById('clerk-sign-in'), {
-        appearance: {
-          elements: {
-            rootBox: { width: '100%' },
-            card: { 
-              boxShadow: 'none',
-              background: 'transparent'
-            }
-          }
-        }
-      });
-    }
-    
-    Clerk.addListener(({ user }) => {
-      if (user && !currentUser) {
-        currentUser = user;
-        showApp();
-        loadUsage();
-      }
-    });
-  } catch (err) {
-    console.error('Clerk error:', err);
-    showApp(); // Fallback
-  }
+// Init
+window.addEventListener('load', () => {
+  hideLoadingMask();
 });
 
-function showAuth() {
-  document.getElementById('auth-screen').classList.remove('hidden');
-  document.getElementById('app-screen').classList.add('hidden');
-}
-
-function showApp() {
-  document.getElementById('auth-screen').classList.add('hidden');
-  document.getElementById('app-screen').classList.remove('hidden');
-}
-
-// Usage tracking
-function loadUsage() {
-  if (!currentUser) return;
-  const key = `figured_usage_${currentUser.id}`;
-  usageCount = parseInt(localStorage.getItem(key) || '0');
-  updateUsageDisplay();
-}
-
-function incrementUsage() {
-  if (!currentUser) return;
-  const key = `figured_usage_${currentUser.id}`;
-  usageCount++;
-  localStorage.setItem(key, usageCount.toString());
-  updateUsageDisplay();
-}
-
-function updateUsageDisplay() {
-  const remaining = Math.max(0, FREE_LIMIT - usageCount);
-  document.getElementById('usage-remaining').textContent = remaining;
-  
-  if (usageCount >= FREE_LIMIT) {
-    document.getElementById('paywall').classList.remove('hidden');
-    document.getElementById('analyze-btn').disabled = true;
-    document.getElementById('analyze-btn').textContent = '升级继续';
+function hideLoadingMask() {
+  const mask = document.getElementById('loading-mask');
+  if (mask) {
+    mask.style.opacity = '0';
+    setTimeout(() => mask.remove(), 300);
   }
 }
+
 
 // File upload
 const uploadZone = document.getElementById('upload-zone');
@@ -589,18 +932,78 @@ fileInput.addEventListener('change', (e) => {
 
 function handleFiles(files) {
   if (files.length > 0) {
-    window.selectedFiles = Array.from(files);
-    uploadZone.querySelector('p').textContent = `已选择 ${files.length} 个文件`;
+    window.selectedFiles = [...(window.selectedFiles || []), ...Array.from(files)];
+    displayFiles(window.selectedFiles);
+  }
+}
+
+function displayFiles(files) {
+  const placeholder = document.getElementById('upload-placeholder');
+  const filesContainer = document.getElementById('upload-files');
+  
+  placeholder.classList.add('hidden');
+  filesContainer.classList.remove('hidden');
+  filesContainer.innerHTML = '';
+  
+  files.forEach((file, index) => {
+    const item = document.createElement('div');
+    item.className = 'upload-file-item';
+    
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        item.innerHTML = `
+          <img src="${e.target.result}" class="file-thumb" alt="">
+          <div class="file-info">
+            <div class="file-name">${file.name}</div>
+            <div class="file-size">${formatFileSize(file.size)}</div>
+          </div>
+          <button class="file-remove" onclick="removeFile(${index})">×</button>
+        `;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      item.innerHTML = `
+        <div class="file-icon">📄</div>
+        <div class="file-info">
+          <div class="file-name">${file.name}</div>
+          <div class="file-size">${formatFileSize(file.size)}</div>
+        </div>
+        <button class="file-remove" onclick="removeFile(${index})">×</button>
+      `;
+    }
+    
+    filesContainer.appendChild(item);
+  });
+
+  // 常驻"继续添加"入口
+  const addMore = document.createElement('div');
+  addMore.className = 'upload-add-more';
+  addMore.textContent = '+ 继续添加截图或聊天记录';
+  addMore.onclick = (e) => { e.stopPropagation(); fileInput.click(); };
+  filesContainer.appendChild(addMore);
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+function removeFile(index) {
+  window.selectedFiles.splice(index, 1);
+  if (window.selectedFiles.length === 0) {
+    document.getElementById('upload-placeholder').classList.remove('hidden');
+    document.getElementById('upload-files').classList.add('hidden');
+    document.getElementById('file-input').value = '';
+  } else {
+    displayFiles(window.selectedFiles);
   }
 }
 
 // Analysis
 async function analyze() {
-  if (currentUser && usageCount >= FREE_LIMIT) {
-    document.getElementById('paywall').scrollIntoView({ behavior: 'smooth' });
-    return;
-  }
-  
+
   const text = document.getElementById('text-input').value.trim();
   const files = window.selectedFiles || [];
   
@@ -612,18 +1015,29 @@ async function analyze() {
   document.getElementById('loading').classList.remove('hidden');
   document.getElementById('error').classList.add('hidden');
   document.getElementById('result').classList.add('hidden');
-  
+  startProgress();
+  SFX.startLoading();
+
   try {
     const payload = { lang: 'zh' };
-    
-    if (files.length > 0) {
-      payload.images = await Promise.all(files.map(async file => ({
+
+    const imageFiles = files.filter(f => f.type.startsWith('image/'));
+    const textFiles = files.filter(f => f.type === 'text/plain' || f.name.endsWith('.txt'));
+
+    if (imageFiles.length > 0) {
+      payload.images = await Promise.all(imageFiles.map(async file => ({
         mimeType: file.type,
         base64: await readFileAsBase64(file)
       })));
     }
-    
-    if (text) payload.text = text;
+
+    // 合并 txt 内容到 text
+    let combinedText = text;
+    if (textFiles.length > 0) {
+      const txts = await Promise.all(textFiles.map(readFileAsText));
+      combinedText = [text, ...txts.map((t, i) => `【${textFiles[i].name}】\n${t}`)].filter(Boolean).join('\n\n');
+    }
+    if (combinedText) payload.text = combinedText;
     
     // Add conversation history for follow-up questions
     if (conversationHistory.length > 0) {
@@ -639,9 +1053,7 @@ async function analyze() {
     const data = await response.json();
     
     if (!data.ok) throw new Error(data.error);
-    
-    if (currentUser) incrementUsage();
-    
+
     // Add to conversation history
     conversationHistory.push({ role: 'user', content: text || '[图片]' });
     conversationHistory.push({ role: 'assistant', content: JSON.stringify(data.analysis) });
@@ -649,9 +1061,11 @@ async function analyze() {
     showResult(data.analysis);
     
   } catch (err) {
-    showError('分析出错，请重试');
-    console.error(err);
+    showError('分析服务暂时不可用，请稍后重试');
+    console.error('Analysis error:', err);
   } finally {
+    stopProgress();
+    SFX.stopLoading();
     document.getElementById('loading').classList.add('hidden');
   }
 }
@@ -665,65 +1079,313 @@ function readFileAsBase64(file) {
   });
 }
 
-function showResult(analysis) {
-  const resultDiv = document.getElementById('result');
-  
-  if (analysis.status === 'incomplete') {
-    // Show question
-    resultDiv.innerHTML = `
-      <div class="question-card">
-        <p>${analysis.question}</p>
-      </div>
-    `;
-  } else {
-    // Show equation
-    let html = `
-      <div class="equation-card">
-        <h4>你的处境</h4>
-        <div class="equation">${analysis.equation || analysis.core_equation}</div>
-      </div>
-    `;
-    
-    if (analysis.factors && analysis.factors.length > 0) {
-      analysis.factors.forEach(factor => {
-        html += `
-          <div class="equation-card">
-            <h4>${factor.name}</h4>
-            <div class="equation">${factor.equation || factor.details?.join(' + ')}</div>
-          </div>
-        `;
-      });
-    }
-    
-    if (analysis.paths && analysis.paths.length > 0) {
-      html += '<div class="equation-card"><h4>可能的选择</h4><div class="path-list">';
-      analysis.paths.forEach((path, i) => {
-        html += `
-          <div class="path-item">
-            <div class="path-label">${path.label || String.fromCharCode(65 + i)}</div>
-            <div class="path-content">
-              <div class="path-name">${path.name || path.label}</div>
-              <div class="path-desc">${path.desc || path.action}</div>
-            </div>
-          </div>
-        `;
-      });
-      html += '</div></div>';
-    }
-    
-    if (analysis.closing) {
-      html += `
-        <div class="equation-card">
-          <h4>一句话</h4>
-          <div class="equation" style="font-style: italic;">${analysis.closing}</div>
-        </div>
-      `;
-    }
-    
-    resultDiv.innerHTML = html;
+function readFileAsText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsText(file, 'utf-8');
+  });
+}
+
+// ── 进度条动画 ──
+let _progTimer = null;
+const _progStages = [
+  { w: 12, t: '提取信息...',    ms: 200 },
+  { w: 35, t: '理解你的处境...', ms: 1400 },
+  { w: 60, t: '建立方程...',    ms: 3200 },
+  { w: 78, t: '分析路径...',    ms: 5800 },
+];
+
+function startProgress() {
+  const bar = document.getElementById('progress-bar');
+  const txt = document.getElementById('progress-text');
+  if (!bar) return;
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  let i = 0;
+  function tick() {
+    if (i >= _progStages.length) return;
+    const s = _progStages[i++];
+    _progTimer = setTimeout(() => {
+      bar.style.transition = 'width 0.8s ease';
+      bar.style.width = s.w + '%';
+      if (txt) txt.textContent = s.t;
+      tick();
+    }, s.ms);
   }
-  
+  tick();
+}
+
+function stopProgress() {
+  if (_progTimer) { clearTimeout(_progTimer); _progTimer = null; }
+  const bar = document.getElementById('progress-bar');
+  if (!bar) return;
+  bar.style.transition = 'width 0.3s ease';
+  bar.style.width = '100%';
+  setTimeout(() => {
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
+  }, 350);
+}
+
+// ── 音效系统 ──
+const SFX = (() => {
+  let ctx = null;
+  let loadTimer = null;
+
+  function init() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    return ctx;
+  }
+
+  // 清脆机械按键声：噪声脉冲 + 短共鸣
+  function click() {
+    try {
+      const c = init();
+      const t = c.currentTime;
+      const len = Math.floor(c.sampleRate * 0.04);
+      const buf = c.createBuffer(1, len, c.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 7);
+      const src = c.createBufferSource(); src.buffer = buf;
+      const bpf = c.createBiquadFilter(); bpf.type = 'bandpass'; bpf.frequency.value = 2600; bpf.Q.value = 1.5;
+      const g = c.createGain(); g.gain.setValueAtTime(0.4, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+      src.connect(bpf); bpf.connect(g); g.connect(c.destination);
+      src.start(t); src.stop(t + 0.04);
+      // 短促共鸣音调
+      const osc = c.createOscillator(); const og = c.createGain();
+      osc.type = 'sine'; osc.frequency.value = 1100;
+      og.gain.setValueAtTime(0.07, t); og.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+      osc.connect(og); og.connect(c.destination); osc.start(t); osc.stop(t + 0.07);
+    } catch(e) {}
+  }
+
+  // 单次加载脉冲：柔和呼吸感
+  function _ping() {
+    try {
+      const c = init(); const t = c.currentTime;
+      const osc = c.createOscillator(); const g = c.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(460, t); osc.frequency.exponentialRampToValueAtTime(500, t + 0.2);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.055, t + 0.04);
+      g.gain.linearRampToValueAtTime(0.055, t + 0.18); g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+      osc.connect(g); g.connect(c.destination); osc.start(t); osc.stop(t + 0.55);
+    } catch(e) {}
+  }
+
+  function startLoading() { _ping(); loadTimer = setInterval(_ping, 1900); }
+  function stopLoading() { if (loadTimer) { clearInterval(loadTimer); loadTimer = null; } }
+
+  // 结果揭示：上升琶音 C5→E5→G5→C6
+  function result() {
+    try {
+      const c = init();
+      [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+        const t = c.currentTime + i * 0.11;
+        const osc = c.createOscillator(); const g = c.createGain();
+        osc.type = 'sine'; osc.frequency.value = freq;
+        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.09, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.65);
+        osc.connect(g); g.connect(c.destination); osc.start(t); osc.stop(t + 0.65);
+      });
+    } catch(e) {}
+  }
+
+  return { click, startLoading, stopLoading, result };
+})();
+
+// 判断因素是否可控（从step3文本中检测）
+function isControllable(name, step3) {
+  if (!step3 || !name) return null;
+  const ctrl = (step3.controllable || '').toLowerCase();
+  const noctrl = (step3.uncontrollable || '').toLowerCase();
+  const n = name.toLowerCase();
+  if (ctrl.includes(n)) return true;
+  if (noctrl.includes(n)) return false;
+  return null;
+}
+
+// 总图景：整体结构可视化
+function buildOverview(analysis) {
+  const hasData = analysis.step1?.equation || analysis.step2?.factors?.length || analysis.step4?.content || analysis.step5?.paths?.length;
+  if (!hasData) return '';
+  let html = '<div class="ov-card">';
+
+  // 标题
+  html += `
+    <div class="ov-header">
+      <div class="ov-header-icon">◎</div>
+      <div class="ov-header-title">总图景</div>
+    </div>`;
+
+  // 主方程（step1）
+  if (analysis.step1?.equation) {
+    html += `<div class="ov-eq">${analysis.step1.equation}</div>`;
+  }
+
+  // 因素芯片（step2，带可控标记）
+  if (analysis.step2?.factors?.length) {
+    html += '<div class="ov-factors">';
+    analysis.step2.factors.forEach(f => {
+      const ctrl = isControllable(f.name, analysis.step3);
+      const cls = ctrl === true ? 'can' : ctrl === false ? 'cannot' : '';
+      const icon = ctrl === true ? '✓' : ctrl === false ? '✗' : '·';
+      html += `
+        <div class="ov-chip ${cls}">
+          <span class="ov-chip-dot"></span>
+          ${icon} ${f.name}
+        </div>`;
+    });
+    html += '</div>';
+  }
+
+  html += '<div class="ov-connector">↓</div>';
+
+  // 你手里的牌（step4）
+  if (analysis.step4?.content) {
+    html += `
+      <div class="ov-pivot">
+        <div class="ov-pivot-label">你手里的牌</div>
+        ${analysis.step4.content}
+      </div>`;
+  }
+
+  html += '<div class="ov-connector">↓</div>';
+
+  // 三条路（step5）
+  if (analysis.step5?.paths?.length) {
+    html += '<div class="ov-paths">';
+    analysis.step5.paths.forEach(p => {
+      html += `
+        <div class="ov-path-item">
+          <div class="ov-path-label">${p.label}</div>
+          <div class="ov-path-text">${p.content}</div>
+        </div>`;
+    });
+    html += '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function step(num, title, content) {
+  const labels = ['一','二','三','四','五','六'];
+  return `
+    <div class="eq-step">
+      <div class="eq-step-header">
+        <div class="eq-step-num">${num}</div>
+        <div class="eq-step-title">第${labels[num-1]}步 · ${title}</div>
+      </div>
+      ${content}
+    </div>`;
+}
+
+function showResult(analysis) {
+  SFX.result();
+  const resultDiv = document.getElementById('result');
+  let html = '';
+
+  // 第一步：设未知数
+  if (analysis.step1) {
+    html += step(1, '设未知数', `
+      <div class="eq-formula-block">${analysis.step1.equation || ''}</div>
+      ${analysis.step1.note ? `<div class="eq-note">${analysis.step1.note}</div>` : ''}
+    `);
+  }
+
+  // 第二步：逐项展开
+  if (analysis.step2?.factors?.length) {
+    let factorsHtml = '';
+    analysis.step2.factors.forEach(f => {
+      // 颜色迁移：与总图景芯片一致
+      const ctrl = isControllable(f.name, analysis.step3);
+      const nameStyle = ctrl === false ? 'color:var(--warm-gray)' : 'color:var(--green)';
+
+      // 构建对齐行（支持新格式 base+addends，兼容旧格式 equation）
+      let linesHtml = '';
+      if (f.base) {
+        linesHtml += `<div class="eq-factor-line"><span class="eq-factor-op"></span><span class="eq-factor-expr">${f.base}</span></div>`;
+        (f.addends || []).forEach(a => {
+          linesHtml += `<div class="eq-factor-line"><span class="eq-factor-op">+</span><span class="eq-factor-expr">${a}</span></div>`;
+        });
+      } else if (f.equation) {
+        linesHtml = `<div class="eq-factor-line"><span class="eq-factor-op"></span><span class="eq-factor-expr">${f.equation}</span></div>`;
+      }
+
+      factorsHtml += `
+        <div class="eq-factor">
+          <div class="eq-factor-name" style="${nameStyle}">（${f.name}）</div>
+          <div class="eq-factor-lines">${linesHtml}</div>
+          ${f.note ? `<div class="eq-factor-note">${f.note}</div>` : ''}
+        </div>`;
+    });
+    html += step(2, '逐项展开', factorsHtml);
+  }
+
+  // 第三步：系数分析
+  if (analysis.step3) {
+    const s3 = analysis.step3;
+    html += step(3, '找瓶颈', `
+      <div class="eq-coeff-grid">
+        <div class="eq-coeff-item">
+          <div class="eq-coeff-label can">✓ 你能控制的</div>
+          <div class="eq-coeff-content">${s3.controllable || ''}</div>
+        </div>
+        <div class="eq-coeff-item">
+          <div class="eq-coeff-label cannot">✗ 不在你手里的</div>
+          <div class="eq-coeff-content">${s3.uncontrollable || ''}</div>
+        </div>
+      </div>
+      ${s3.conclusion ? `<div class="eq-conclusion">${s3.conclusion}</div>` : ''}
+    `);
+  }
+
+  // 第四步：移项
+  if (analysis.step4?.content) {
+    html += step(4, '移项', `
+      <div class="eq-card-block">${analysis.step4.content}</div>
+    `);
+  }
+
+  // 第五步：你的选择
+  if (analysis.step5?.paths?.length) {
+    let pathsHtml = '';
+    analysis.step5.paths.forEach(p => {
+      pathsHtml += `
+        <div class="eq-path">
+          <div class="eq-path-label">${p.label}</div>
+          <div class="eq-path-content">${p.content}</div>
+        </div>`;
+    });
+    html += step(5, '你的选择', pathsHtml);
+  }
+
+  // 第六步：代入检验
+  if (analysis.step6?.questions?.length) {
+    let qHtml = '';
+    analysis.step6.questions.forEach(q => {
+      qHtml += `
+        <div class="eq-question">
+          <div class="eq-question-label">${q.label}</div>
+          <div class="eq-question-content">${q.content}</div>
+        </div>`;
+    });
+    html += step(6, '代入检验', qHtml);
+  }
+
+  // 总图景
+  html += buildOverview(analysis);
+
+  // 结尾
+  if (analysis.closing) {
+    html += `<div class="eq-closing">${analysis.closing}</div>`;
+  }
+
+  resultDiv.innerHTML = html || '<div class="eq-closing">分析完成</div>';
   resultDiv.classList.remove('hidden');
+  resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function showError(msg) {
@@ -732,7 +1394,13 @@ function showError(msg) {
   errorDiv.classList.remove('hidden');
 }
 
-document.getElementById('analyze-btn').addEventListener('click', analyze);
+document.getElementById('analyze-btn').addEventListener('click', () => { SFX.click(); analyze(); });
+
+// 所有按钮点击音效
+document.addEventListener('click', (e) => {
+  if (e.target.matches('button') && e.target.id !== 'analyze-btn') SFX.click();
+});
+uploadZone.addEventListener('click', SFX.click);
 </script>
 </body>
 </html>
